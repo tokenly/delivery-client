@@ -31,17 +31,17 @@ class Client
         $data['webhook'] = $webhook;
         $data['join_callback'] = $join_callback;
         $data['auto_fulfill'] = $auto_fulfill;
-        return $this->newAPIRequest('POST', '/api/v1/source', $data);
+        return $this->newAPIRequest('POST', '/source', $data);
     }
     
     public function getSourceAddressList()
     {
-        return $this->newAPIRequest('GET', '/api/v1/source');
+        return $this->newAPIRequest('GET', '/source');
     }
     
     public function getSourceAddress($uuid)
     {
-        return $this->newAPIRequest('GET', '/api/v1/source/'.$uuid);
+        return $this->newAPIRequest('GET', '/source/'.$uuid);
     }
 
 
