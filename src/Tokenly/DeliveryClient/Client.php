@@ -33,6 +33,16 @@ class Client
         $data['auto_fulfill'] = $auto_fulfill;
         return $this->newAPIRequest('POST', '/api/v1/source', $data);
     }
+    
+    public function getSourceAddressList()
+    {
+        return $this->newAPIRequest('GET', '/api/v1/source';
+    }
+    
+    public function getSourceAddress($uuid)
+    {
+        return $this->newAPIRequest('GET', '/api/v1/source/'.$uuid);
+    }
 
 
     ////////////////////////////////////////////////////////////////////////
