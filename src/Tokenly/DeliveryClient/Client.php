@@ -36,7 +36,7 @@ class Client
     
     public function getSourceAddressList()
     {
-        return $this->newAPIRequest('GET', '/api/v1/source';
+        return $this->newAPIRequest('GET', '/api/v1/source');
     }
     
     public function getSourceAddress($uuid)
