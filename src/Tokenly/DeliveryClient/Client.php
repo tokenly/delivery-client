@@ -43,6 +43,27 @@ class Client
     {
         return $this->newAPIRequest('GET', '/source/'.$uuid);
     }
+    
+    public function updateSourceAddress($uuid, $data)
+    {
+        $use_data = array();
+        $fields =array('webhook', 'label', 'join_callback', 'active', 'auto_fulfill');
+        foreach($fields as $f){
+            if(isset($data[$f])){
+                $use_data[$f] = $data[$f];
+            }
+        }
+        if(count($use_data) == 0){
+            throw new Exception('No data to update for delivery source address');
+        }
+        return $this->newAPIRequest('PATCH', '/source/'.$uuid, $use_data);
+    }
+    
+    public function shutdownSourceAddress($uuid, $sweep_address)
+    {
+        $data = array('sweep_address' => $sweep_address);
+        return $this->newAPIRequest('DELETE', '/source/'.$uuid, $data);
+    }
 
 
     ////////////////////////////////////////////////////////////////////////
