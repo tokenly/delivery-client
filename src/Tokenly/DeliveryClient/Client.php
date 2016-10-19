@@ -37,12 +37,29 @@ class Client
     
     public function getSourceAddressList()
     {
-        return $this->newAPIRequest('GET', '/source');
+        $get = false;
+        try{
+            $get = $this->newAPIRequest('GET', '/source');
+        }
+        catch(DeliveryException $e){
+            throw new Exception('Error getting list of source addresses: '.$e->getMessage());
+        }
+        return $get;
     }
     
     public function getSourceAddress($uuid)
     {
-        return $this->newAPIRequest('GET', '/source/'.$uuid);
+        $get = false;
+        try{
+            $get = $this->newAPIRequest('GET', '/source/'.$uuid);
+        }
+        catch(DeliveryException $e){
+            throw new Exception('Error getting source address: '.$e->getMessage());
+        }
+        if(!isset($get['result'])){
+            throw new Exception('Unknown error getting source address');
+        }
+        return $get['result'];
     }
     
     public function updateSourceAddress($uuid, $data)
@@ -63,7 +80,16 @@ class Client
     public function shutdownSourceAddress($uuid, $sweep_address)
     {
         $data = array('sweep_address' => $sweep_address);
-        return $this->newAPIRequest('DELETE', '/source/'.$uuid, $data);
+        try{
+            $shutdown = $this->newAPIRequest('DELETE', '/source/'.$uuid, $data);
+        }
+        catch(DeliveryException $e){
+            throw new Exception('Error shutting down source address: '.$e->getMessage());
+        }
+        if(!isset($get['result'])){
+            throw new Exception('Unknown error updating source address');
+        }
+        return $shutdown['result'];
     }
     
     
