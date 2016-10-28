@@ -229,7 +229,32 @@ class Client
         }
         return $output; 
     }
-
+    
+    /** fulfillment methdods **/
+    
+    public function fulfillSingleDelivery($uuid)
+    {
+        return $this->newAPIRequest('PATCH', '/fulfillment/single/'.$uuid);
+    }
+    
+    public function completeDelivery($uuid)
+    {
+        return $this->fulfillSingleDelivery($uuid);
+    }
+    
+    public function fulfillMultipleDeliveries($source, $filters = array())
+    {
+        $filter_params = array();
+        if(isset($filters['tokens'])){
+            $filter_params['tokens'] = $filters['tokens'];
+        }
+        return $this->newAPIRequest('PATCH', '/fulfillment/multiple/'.$source, $filter_params);
+    }
+    
+    public function completeMultiple($source, $filters)
+    {
+        return $this->fulfillMultipleDeliveries($source, $filters);
+    }
 
     ////////////////////////////////////////////////////////////////////////
 
