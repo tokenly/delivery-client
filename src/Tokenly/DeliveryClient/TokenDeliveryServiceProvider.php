@@ -26,13 +26,8 @@ class TokenDeliveryServiceProvider extends ServiceProvider
         $this->bindConfig();
 
         $this->app->bind('Tokenly\DeliveryClient\Client', function($app) {
-            $xchain_client = new \Tokenly\DeliveryClient\Client(Config::get('tokendelivery.connection_url'), Config::get('tokendelivery.api_token'), Config::get('tokendelivery.api_key'));
-            return $xchain_client;
-        });
-
-        $this->app->bind('Tokenly\DeliveryClient\WebHookReceiver', function($app) {
-            $webhook_receiver = new \Tokenly\DeliveryClient\WebHookReceiver(Config::get('tokendelivery.api_token'), Config::get('tokendelivery.api_key'));
-            return $webhook_receiver;
+            $delivery_client = new \Tokenly\DeliveryClient\Client(Config::get('tokendelivery.connection_url'), Config::get('tokendelivery.api_token'), Config::get('tokendelivery.api_key'));
+            return $delivery_client;
         });
     }
 

@@ -3,23 +3,20 @@
 namespace Tokenly\DeliveryClient;
 
 use Exception;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\RequestException;
+use Tokenly\APIClient\Exception\APIException;
+use Tokenly\APIClient\TokenlyAPI;
 use Tokenly\CurrencyLib\Quantity;
 use Tokenly\HmacAuth\Generator;
-use Tokenly\DeliveryClient\Exception\DeliveryException;
 
 /**
 * Token Delivery Service Client
 */
-class Client
+class Client extends TokenlyAPI
 {
     
     function __construct($api_url, $api_token, $api_secret_key)
     {
-        $this->api_url     = $api_url;
-        $this->api_token      = $api_token;
-        $this->api_secret_key = $api_secret_key;
+        parent::__construct($api_url, $this->getAuthenticationGenerator(), $api_token, $api_secret_key);
     }
     
     /** Source Address Methods **/
@@ -41,7 +38,7 @@ class Client
         try{
             $get = $this->newAPIRequest('GET', '/source');
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error getting list of source addresses: '.$e->getMessage());
         }
         return $get;
@@ -83,7 +80,7 @@ class Client
         try{
             $shutdown = $this->newAPIRequest('DELETE', '/source/'.$uuid, $data);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error shutting down source address: '.$e->getMessage());
         }
         if(!isset($get['result'])){
@@ -116,7 +113,7 @@ class Client
         try{
             $delivery = $this->newAPIRequest('POST', '/delivery', $data);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error creating delivery: '.$e->getMessage());
         }
         if(!isset($delivery['result'])){
@@ -131,7 +128,7 @@ class Client
         try{
             $delivery = $this->newAPIRequest('GET', '/delivery/'.$uuid);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error getting details: '.$e->getMessage());
         }
         if(!isset($delivery['result'])){
@@ -153,7 +150,7 @@ class Client
         try{
             $output = $this->newAPIRequest('GET', '/delivery', $use_filters);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception($e->getMessage());
         }
         return $output;
@@ -172,7 +169,7 @@ class Client
         try{
             $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error updating delivery: '.$e->getMessage());
         }
         if(!$update){
@@ -189,7 +186,7 @@ class Client
         try{
             $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error marking delivery as ready to fulfill: '.$e->getMessage());
         }
         if(!$update){
@@ -206,7 +203,7 @@ class Client
         try{
             $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error marking delivery as no longer ready to fulfill: '.$e->getMessage());
         }
         if(!$update){
@@ -221,7 +218,7 @@ class Client
         try{
             $delete = $this->newAPIRequest('DELETE', '/delivery/'.$uuid);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error canceling delivery: '.$e->getMessage());
         }
         if(!$delete){
@@ -258,62 +255,9 @@ class Client
 
     ////////////////////////////////////////////////////////////////////////
 
-    protected function newAPIRequest($method, $path, $data=[]) {
+    protected function newAPIRequest($method, $path, $parameters=[], $options=[]) {
         $api_path = '/api/v1'.$path;
-
-        $client = new GuzzleClient();
-
-        if ($data AND ($method == 'POST' OR $method == 'PATCH')) {
-            $body = \GuzzleHttp\Psr7\stream_for(json_encode($data));
-            $headers = ['Content-Type' => 'application/json'];
-            $request = new \GuzzleHttp\Psr7\Request($method, $this->api_url.$api_path, $headers, $body);
-        } else if ($method == 'GET') {
-            $request = new \GuzzleHttp\Psr7\Request($method, $this->api_url.$api_path);
-            $request = \GuzzleHttp\Psr7\modify_request($request, ['query' => http_build_query($data, null, '&', PHP_QUERY_RFC3986)]);
-        } else {
-            $request = new \GuzzleHttp\Psr7\Request($method, $this->api_url.$api_path);
-        }
-
-        // add auth
-        $request = $this->getAuthenticationGenerator()->addSignatureToGuzzle6Request($request, $this->api_token, $this->api_secret_key);
-        
-        // send request
-        try {
-            $response = $client->send($request);
-        } catch (RequestException $e) {
-            if ($response = $e->getResponse()) {
-                // interpret the response and error message
-                $code = $response->getStatusCode();
-                try {
-                    $json = json_decode($response->getBody(), true);
-                } catch (Exception $parse_json_exception) {
-                    // could not parse json
-                    $json = null;
-                }
-                if ($json and isset($json['error'])) {
-                    $delivery_exception = new DeliveryException($json['error'], $code);
-                    throw $delivery_exception;
-                }
-                elseif($json AND isset($json['message'])){
-                    $delivery_exception = new DeliveryException($json['message'], $code);
-                    throw $delivery_exception;
-                }
-            }
-
-            // if no response, then just throw the original exception
-            throw $e;
-        }
-
-        $code = $response->getStatusCode();
-        if ($code == 204) {
-            // empty content
-            return [];
-        }
-
-        $json = json_decode($response->getBody(), true);
-        if (!is_array($json)) { throw new Exception("Unexpected response: ".$response->getBody(), 1); }
-
-        return $json;
+        return $this->call($method, $api_path, $parameters, $options);
     }
 
     protected function getAuthenticationGenerator() {
