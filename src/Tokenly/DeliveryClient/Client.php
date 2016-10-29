@@ -116,10 +116,7 @@ class Client extends TokenlyAPI
         catch(APIException $e){
             throw new Exception('Error creating delivery: '.$e->getMessage());
         }
-        if(!isset($delivery['result'])){
-            throw new Exception('Unknown error creating token delivery');
-        }
-        return $delivery['result'];
+        return $delivery;
     }
     
     public function getDelivery($uuid)
@@ -131,10 +128,7 @@ class Client extends TokenlyAPI
         catch(APIException $e){
             throw new Exception('Error getting details: '.$e->getMessage());
         }
-        if(!isset($delivery['result'])){
-            throw new Exception('Unknown error getting delivery details');
-        }
-        return $delivery['result'];
+        return $delivery;
     }
     
     public function getDeliveryList($filters = array())
@@ -165,73 +159,73 @@ class Client extends TokenlyAPI
                 $use_data[$f] = $data[$f];
             }
         }
-        $update = false;
+        $update_results = false;
         try{
-            $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
+            $update_results = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
         catch(APIException $e){
             throw new Exception('Error updating delivery: '.$e->getMessage());
         }
-        if(!$update){
+        if(!$update_results){
             throw new Exception('Unknown error updating delivery');
         }
-        return $output; 
+        return $update_results; 
     }
     
     public function markReady($uuid)
     {
         $use_data = array();
         $use_data['ready'] = true;
-        $update = false;
+        $update_results = false;
         try{
-            $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
+            $update_results = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
         catch(APIException $e){
             throw new Exception('Error marking delivery as ready to fulfill: '.$e->getMessage());
         }
-        if(!$update){
+        if(!$update_results){
             throw new Exception('Unknown error marking delivery ready to fulfill');
         }
-        return $output; 
+        return $update_results; 
     }
     
     public function markUnready($uuid)
     {
         $use_data = array();
         $use_data['ready'] = false;
-        $update = false;
+        $update_results = false;
         try{
-            $update = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
+            $update_results = $this->newAPIRequest('PATCH', '/delivery/'.$uuid, $use_data);
         }
         catch(APIException $e){
             throw new Exception('Error marking delivery as no longer ready to fulfill: '.$e->getMessage());
         }
-        if(!$update){
+        if(!$update_results){
             throw new Exception('Unknown error marking delivery no longer ready to fulfill');
         }
-        return $output; 
+        return $update_results; 
     }
     
     public function cancelDelivery($uuid)
     {
-        $delete = false;
+        $delete_results = false;
         try{
-            $delete = $this->newAPIRequest('DELETE', '/delivery/'.$uuid);
+            $delete_results = $this->newAPIRequest('DELETE', '/delivery/'.$uuid);
         }
         catch(APIException $e){
             throw new Exception('Error canceling delivery: '.$e->getMessage());
         }
-        if(!$delete){
+        if(!$delete_results){
             throw new Exception('Unknown error canceling delivery');
         }
-        return $output; 
+        return $delete_results; 
     }
     
     /** fulfillment methdods **/
     
     public function fulfillSingleDelivery($uuid)
     {
-        return $this->newAPIRequest('PATCH', '/fulfillment/single/'.$uuid);
+        return $this->newAPIRequest('POST', '/fulfillment/single/'.$uuid);
     }
     
     public function completeDelivery($uuid)
@@ -245,7 +239,7 @@ class Client extends TokenlyAPI
         if(isset($filters['tokens'])){
             $filter_params['tokens'] = $filters['tokens'];
         }
-        return $this->newAPIRequest('PATCH', '/fulfillment/multiple/'.$source, $filter_params);
+        return $this->newAPIRequest('POST', '/fulfillment/multiple/'.$source, $filter_params);
     }
     
     public function completeMultiple($source, $filters)
