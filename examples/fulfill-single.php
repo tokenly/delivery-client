@@ -12,16 +12,11 @@ try {
     $api_secret_key = getenv('TOKENDELIVERY_API_KEY');        if ($api_secret_key === false) { throw new Exception("TOKENDELIVERY_API_KEY environment var must be defined", 1); }
 
     // arguments
-    $label         = $argv[1];
-    $type          = $argv[2];
-    $webhook       = (isset($argv[3]) AND strlen($argv[3])) ? $argv[3] : null;
-    $join_callback = (isset($argv[4]) AND strlen($argv[4])) ? $argv[4] : null;
-    $auto_fulfill  = !!(isset($argv[5]) ? $argv[5] : true);
-    if (!$label) { throw new Exception("label is required", 1); }
-    if (!$type) { throw new Exception("type is required", 1); }
+    $uuid          = $argv[1];
+    if (!$uuid) { throw new Exception("uuid is required", 1); }
 } catch (Exception $e) {
     echo $e->getMessage()."\n";
-    echo "Usage: ".basename(__FILE__).' <label> <type:"2:2" or "2:3")> [<webhook>] [<join_callback>] [<auto_fulfill>]'."\n";
+    echo "Usage: ".basename(__FILE__)." <uuid>\n";
     exit(1);
 }
 
@@ -29,5 +24,5 @@ try {
 $api = new DeliveryClient($api_url, $api_token, $api_secret_key);
 
 // run and show the results
-$api_result = $api->newSourceAddress($label, $type, $webhook, $join_callback, $auto_fulfill);
+$api_result = $api->fulfillSingleDelivery($uuid);
 echo json_encode($api_result, 192)."\n";
