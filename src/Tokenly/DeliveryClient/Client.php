@@ -46,17 +46,17 @@ class Client extends TokenlyAPI
     
     public function getSourceAddress($uuid)
     {
-        $get = false;
+        $api_result = false;
         try{
-            $get = $this->newAPIRequest('GET', '/source/'.$uuid);
+            $api_result = $this->newAPIRequest('GET', '/source/'.$uuid);
         }
-        catch(DeliveryException $e){
+        catch(APIException $e){
             throw new Exception('Error getting source address: '.$e->getMessage());
         }
-        if(!isset($get['result'])){
+        if(!$api_result){
             throw new Exception('Unknown error getting source address');
         }
-        return $get['result'];
+        return $api_result;
     }
     
     public function updateSourceAddress($uuid, $data)
