@@ -21,7 +21,7 @@ class Client extends TokenlyAPI
     
     /** Source Address Methods **/
 
-    public function newSourceAddress($label, $type, $webhook = null, $join_callback = null, $auto_fulfill = true)
+    public function newSourceAddress($label, $type, $webhook = null, $join_callback = null, $auto_fulfill = true, $desired_utxo_primes = null)
     {
         $data = array();
         $data['label'] = $label;
@@ -29,6 +29,9 @@ class Client extends TokenlyAPI
         $data['webhook'] = $webhook;
         $data['join_callback'] = $join_callback;
         $data['auto_fulfill'] = $auto_fulfill;
+        if($desired_utxo_primes != null){
+            $data['desired_utxo_primes'] = $desired_utxo_primes;
+        }
         return $this->newAPIRequest('POST', '/source', $data);
     }
     
@@ -62,7 +65,7 @@ class Client extends TokenlyAPI
     public function updateSourceAddress($uuid, $data)
     {
         $use_data = array();
-        $fields =array('webhook', 'label', 'join_callback', 'active', 'auto_fulfill');
+        $fields =array('webhook', 'label', 'join_callback', 'active', 'auto_fulfill', 'desired_utxo_primes');
         foreach($fields as $f){
             if(isset($data[$f])){
                 $use_data[$f] = $data[$f];
