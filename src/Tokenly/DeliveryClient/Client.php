@@ -122,6 +122,17 @@ class Client extends TokenlyAPI
         return $delivery;
     }
     
+    public function multipleNewDeliveries($deliveries)
+    {
+        try{
+            $new_deliveries = $this->newAPIRequest('POST', '/delivery/multiple', $deliveries);
+        }
+        catch(APIException $e){
+            throw new Exception('Error creating multiple deliveries: '.$e->getMessage());
+        }
+        return $new_deliveries;
+    }
+    
     public function getDelivery($uuid)
     {
         $delivery = false;
