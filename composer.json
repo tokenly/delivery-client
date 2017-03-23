@@ -19,6 +19,6 @@
         "phpunit/phpunit": "~4"
     },
     "autoload": {
-        "psr-4": {"Tokenly\\DeliveryClient\\": "src\"}
+        "psr-4": {"Tokenly\\DeliveryClient\\": "src\\"}
     }
 }
