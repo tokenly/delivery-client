@@ -265,6 +265,36 @@ class Client extends TokenlyAPI
         return $this->fulfillMultipleDeliveries($source, $filters);
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * issue a new token from the given payment address
+     * confirmed funds are sent first if they are available
+     * @param  string $source             source address uuid or bitcoin address
+     * @param  float  $quantity           quantity to issue
+     * @param  string $asset              asset name to issue
+     * @param  bool   $divisible          Whether the asset is divisible or not
+     * @param  string $description        description attached to the issuance
+     * @param  float  $fee_per_kb         bitcoin fee per kilobyte
+     * @return array                      An array with the issuance information, including `id`
+     */
+    public function createIssuance($source, $quantity, $asset, $divisible, $description='', $fee_per_kb=null) {
+
+        $body = [
+            'quantity'  => $quantity,
+            'asset'     => $asset,
+            'divisible' => $divisible,
+        ];
+        if ($description !== null) { $body['description'] = $description; }
+        if ($fee_per_kb !== null)  { $body['feePerKB']    = $fee_per_kb; }
+
+        return $this->newAPIRequest('POST', '/issuance/'.$source, $body);
+    }
+
+
+
     ////////////////////////////////////////////////////////////////////////
 
     protected function newAPIRequest($method, $path, $parameters=[], $options=[]) {
