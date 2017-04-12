@@ -39,16 +39,26 @@ class Client extends TokenlyAPI
         return $this->newAPIRequest('POST', '/source', $data);
     }
     
-    public function getSourceAddressList()
+    /**
+     * fetch existing source addresses
+     * Can be filtered by tokenpass username with the assign_user parameter
+     * @param  array $parameters filter the list.  Accepts (string) assign_user, (bool) archived
+     * @return array API response
+     */
+    public function getSourceAddressList($parameters=null)
     {
-        $get = false;
-        try{
-            $get = $this->newAPIRequest('GET', '/source');
+        $result = false;
+        try {
+            $query_params = [];
+            if ($parameters !== null) {
+                $query_params = $parameters;
+            }
+            $result = $this->newAPIRequest('GET', '/source', $query_params);
         }
-        catch(APIException $e){
+        catch(APIException $e) {
             throw new Exception('Error getting list of source addresses: '.$e->getMessage());
         }
-        return $get;
+        return $result;
     }
     
     public function getSourceAddress($uuid)
