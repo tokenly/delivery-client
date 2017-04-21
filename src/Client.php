@@ -287,18 +287,23 @@ class Client extends TokenlyAPI
      * @param  string $asset              asset name to issue
      * @param  bool   $divisible          Whether the asset is divisible or not
      * @param  string $description        description attached to the issuance
-     * @param  float  $fee_per_kb         bitcoin fee per kilobyte
+     * @param  string $fee_rate           A fee rate to use. Accepts a pre-defined setting ("low","lowmed","medium","medhigh","high"), a number of blocks ("6 blocks"), or an exact number of satohis per byte ("75")
+     * @param  string $fee_satoshis       An exact fee to use in satoshis
      * @return array                      An array with the issuance information, including `id`
      */
-    public function createIssuance($source, $quantity, $asset, $divisible, $description='', $fee_per_kb=null) {
+    public function createIssuance($source, $quantity, $asset, $divisible, $description='', $fee_rate=null, $fee_satoshis=null) {
+        if ($fee_rate !== null AND $fee_satoshis !== null) {
+            throw new Exception("Specify either fee_rate or fee_satoshis, but not both.", 1);
+        }
 
         $body = [
-            'quantity'  => $quantity,
-            'asset'     => $asset,
-            'divisible' => $divisible,
+            'quantity'    => $quantity,
+            'asset'       => $asset,
+            'divisible'   => $divisible,
+            'description' => $description,
         ];
-        if ($description !== null) { $body['description'] = $description; }
-        if ($fee_per_kb !== null)  { $body['feePerKB']    = $fee_per_kb; }
+        if ($fee_rate !== null)     { $body['feeRate']     = $fee_rate; }
+        if ($fee_satoshis !== null) { $body['feeSat']      = $fee_satoshis; }
 
         return $this->newAPIRequest('POST', '/issuance/'.$source, $body);
     }
