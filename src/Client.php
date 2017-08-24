@@ -181,7 +181,7 @@ class Client extends TokenlyAPI
     public function updateDelivery($uuid, $data)
     {
         $use_data = array();
-        $valid_fields = array('quantity', 'delivery_date', 'ref_data', 'ready');
+        $valid_fields = array('quantity', 'delivery_date', 'ref_data', 'ready', 'destination');
         foreach($valid_fields as $f){
             if(isset($data[$f])){
                 $use_data[$f] = $data[$f];
@@ -275,6 +275,13 @@ class Client extends TokenlyAPI
         return $this->fulfillMultipleDeliveries($source, $filters);
     }
 
+    function updateEmailTx($username, $email) {
+        $data = array(
+            'username' => $username,
+            'email'    => $email
+        );
+        return $this->newAPIRequest('POST', '/v1/email_deliveries/update', $data);
+    }
 
     ////////////////////////////////////////////////////////////////////////
 
