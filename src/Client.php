@@ -280,7 +280,7 @@ class Client extends TokenlyAPI
             'username' => $username,
             'email'    => $email
         );
-        return $this->newAPIRequest('POST', '/v1/email_deliveries/update', $data);
+        return $this->newAPIRequest('POST', '/email_deliveries/update', $data);
     }
 
     ////////////////////////////////////////////////////////////////////////
