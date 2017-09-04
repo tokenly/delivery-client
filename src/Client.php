@@ -275,10 +275,11 @@ class Client extends TokenlyAPI
         return $this->fulfillMultipleDeliveries($source, $filters);
     }
 
-    function updateEmailTx($username, $email) {
+    function updateEmailTx($username, $email, $privilege_key) {
         $data = array(
             'username' => $username,
-            'email'    => $email
+            'email'    => $email,
+            'key' => $privilege_key
         );
         return $this->newAPIRequest('POST', '/email_deliveries/update', $data);
     }
