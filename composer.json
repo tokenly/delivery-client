@@ -12,11 +12,11 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "tokenly/bitcoin-currency-lib": "^1.1",
-        "tokenly/api-client": "^1.0.5"
+        "tokenly/bitcoin-currency-lib": "dev-master",
+        "tokenly/api-client": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4"
+        "phpunit/phpunit": "~7"
     },
     "autoload": {
         "psr-4": {"Tokenly\\DeliveryClient\\": "src\\"}
